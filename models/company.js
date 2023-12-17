@@ -141,91 +141,50 @@ class Company {
     return companies;
   }
 
-  /** Filter by company name and minEmployees, return data about that company
-   * 
-   *  Returns [{handle, name, description, numEmployees logo_url}]
-   */
-
-  static async getNameMin(name, min) {
-    // Convert to an integer and check if valid
-    let minInt = parseInt(min, 10); 
-
-    if (isNaN(minInt) || minInt < 0) {
-      throw new ExpressError(`minEmployees is either NaN or negative`);
-    };
-
-    const queryString = 
-    `SELECT handle,
-            name,
-            description,
-            num_employees AS "numEmployees",
-            logo_url AS "logoUrl"
-    FROM companies
-    WHERE name ILIKE '%${name}%'
-      AND num_employees >= ${minInt};`;
-
-    const companyRes = await db.query(queryString);
-    const companies = companyRes.rows;
-
-    return companies;
-  }
-
-  /** Filter by company name and maxEmployees, return data about that company
-   * 
-   *  Returns [{handle, name, description, numEmployees logo_url}]
-   */
-
-  static async getNameMax(name, max) {
-    // Convert to an integer and check if valid
-    let maxInt = parseInt(max, 10); 
-
-    if (isNaN(maxInt) || maxInt < 0) {
-      throw new ExpressError(`maxEmployees is either NaN or negative`);
-    };
-
-    const queryString = 
-    `SELECT handle,
-            name,
-            description,
-            num_employees AS "numEmployees",
-            logo_url AS "logoUrl"
-    FROM companies
-    WHERE name ILIKE '%${name}%'
-      AND num_employees <= ${maxInt};`;
-
-    const companyRes = await db.query(queryString);
-    const companies = companyRes.rows;
-
-    return companies;
-  }
-
   /** Filter by company name and maxEmployees or minEmployees, return data about that company
    * 
    *  Returns [{handle, name, description, numEmployees logo_url}]
    */
 
   static async getFilterNameRange(name, min, max) {
-    let andPredicate = ''; // Extra predicate if filter is both min and max
+    let firstPredicate = ''; // First predicate 
+    let secondPredicate = ''; // Second predicate
 
     // if both min and max exist, include in filter
     if (min && max) {
       let minInt = parseInt(min, 10);
       let maxInt = parseInt(max, 10);
+      console.log(`minInt is ${minInt}`);
+      console.log(`maxInt is ${maxInt}`);
 
       if (isNaN(minInt) || minInt < 0) {
         throw new ExpressError(`minEmployees is either NaN or negative`);
-      } else if (isNaN(maxInt) || maxInt < 0) {
-        throw new ExpressError(`maxEmployees is either NaN or negative`);
       } else if (isNaN(maxInt) || maxInt < 0) {
         throw new ExpressError(`maxEmployees is either NaN or negative`);
       } else if (minInt > maxInt) {
         throw new ExpressError('minEmployees cannot be more than maxEmployees');
       }
 
-      let firstPredicate = `num_employees >= ${minInt},`; // first predicate to filter out min employees
-      andPredicate = `AND num_employees <= ${maxInt}`; // second predicate to filter out max employees
+      firstPredicate = `num_employees >= ${minInt}`; // first predicate to filter out min employees
+      secondPredicate = `AND num_employees <= ${maxInt}`; // second predicate to filter out max employees
 
+    } else if (min) {
+      let minInt = parseInt(min, 10);
 
+      if (isNaN(minInt) || minInt < 0) {
+        throw new ExpressError(`minEmployees is either NaN or negative`); 
+      };
+
+      firstPredicate = `num_employees >= ${minInt}`;
+  
+    } else if (max) {
+      let maxInt = parseInt(max, 10);
+
+      if (isNaN(maxInt) || maxInt < 0) {
+        throw new ExpressError(`maxEmployees is either NaN or negative`); 
+      };
+
+      firstPredicate = `num_employees <= ${maxInt}`;
     }
      
     const queryString = 
@@ -235,8 +194,8 @@ class Company {
             num_employees AS "numEmployees",
             logo_url AS "logoUrl"
     FROM companies
-    WHERE ${firstPredicate}
-      AND num_employees <= ${maxInt};`;
+    WHERE name ILIKE '%${name}%' 
+      AND ${firstPredicate} ${secondPredicate};`;
 
     const companyRes = await db.query(queryString);
     const companies = companyRes.rows;

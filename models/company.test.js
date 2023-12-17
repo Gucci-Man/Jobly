@@ -114,40 +114,6 @@ describe("get", function () {
 /************************************** get with filters */
 
 describe("get with filters", function () {
-
-  test("work: filter by name and maxEmployees", async function () {
-    let companies = await Company.getNameMax("c", "2");
-    expect(companies).toEqual([
-      {
-        handle: "c1",
-        name: "C1",
-        description: "Desc1",
-        numEmployees: 1,
-        logoUrl: "http://c1.img",
-      },
-      {
-        handle: "c2",
-        name: "C2",
-        description: "Desc2",
-        numEmployees: 2,
-        logoUrl: "http://c2.img",
-      },
-    ]);
-  });
-
-  test("work: filter by name and minEmployees", async function () {
-    let companies = await Company.getNameMin("c", "3");
-    expect(companies).toEqual([
-      {
-        handle: "c3",
-        name: "C3",
-        description: "Desc3",
-        numEmployees: 3,
-        logoUrl: "http://c3.img",
-      },
-    ]);
-  });
-
   test("work: filter by minEmployees and maxEmployees", async function () {
     let companies = await Company.getMinMax("3", "3");
     expect(companies).toEqual([
@@ -229,6 +195,21 @@ describe("get with filters", function () {
     ]);
   });
 
+  test("work: filter by minEmployees and maxEmployees with getFilterNameRange", async function () {
+    let min = "2";
+    let max = "2";
+    let companies = await Company.getFilterNameRange("c", min, max);
+    expect(companies).toEqual([
+      {
+        handle: "c2",
+        name: "C2",
+        description: "Desc2",
+        numEmployees: 2,
+        logoUrl: "http://c2.img",
+      },
+    ]);
+  });
+
   test("work: filter by name, minEmployees and maxEmployees with getFilterNameRange", async function () {
     let min = "1";
     let max = "2";
@@ -251,11 +232,11 @@ describe("get with filters", function () {
     ]);
   });
 
-  test("fail: filter all with minEmployees greater than maxEmployees with getFilterRange", async function () {
+  test("fail: filter all when minEmployees is greater than maxEmployees with getFilterNameRange", async function () {
     let min = "4";
     let max = "3";
     try {
-      await Company.getFilterRange("c", min, max);
+      await Company.getFilterNameRange("c", min, max);
       fail();
     } catch (err) {
       expect(err instanceof ExpressError).toBeTruthy();
