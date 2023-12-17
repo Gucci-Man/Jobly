@@ -87,78 +87,57 @@ class Company {
     return company;
   }
 
-  /** Filter by company name, return data about that company
+  /** Filter by company name, maxEmployees or minEmployees. return data about that company
    * 
-   *  Returns [{handle, name, description, logo_url}]
+   *  Takes a filter keyword ("name", "minEmployees", "maxEmployees") and corresponding value
+   * 
+   *  Returns [{handle, name, description, logo_url}], includes numEmployees if applicable. 
    */
 
-  static async getName(name) {
-    const queryString = 
-    `SELECT handle,
-            name,
-            description,
-            logo_url AS "logoUrl"
-    FROM companies
-    WHERE name ILIKE '%${name}%';`;
+  static async getFilterOne(filter, value) {
+    let predicate = null; // The predicate to filter 
+    let colName = null; // Name of column to filter by. Either name or num_employees
+    let queryString = null; // Store query 
+    let employeeCol = "" // Include employee column if filter is applicable. If not leave blank
+    let sqlValue = null; // Updates value dependent on filter
 
-    const companyRes = await db.query(queryString);
-    const companies = companyRes.rows;
+    //***  Filter on number of employees ***/
+    if (filter === 'minEmployees' || filter === 'maxEmployees') {
+      let valueInt = parseInt(value, 10);
+      employeeCol = 'num_employees AS "numEmployees",'; 
+      colName = 'num_employees'
+      sqlValue = value; 
 
-    return companies;
-  }
+      if (isNaN(valueInt) || valueInt < 0) {
+        throw new ExpressError(`${filter} is either NaN or negative`);
+      };
 
-  /** Filter by company minEmployees, return data about that company
-   * 
-   *  Returns [{handle, name, description, numEmployees logo_url}]
-   */
-
-  static async getMin(min) {
-    // Convert to an integer and check if valid
-    let minInt = parseInt(min, 10); 
-    if (isNaN(minInt) || minInt < 0) {
-      throw new ExpressError(`minEmployees is either NaN or negative`);
+      if (filter === 'minEmployees') {
+        predicate = '>=';
+      } else if (filter === 'maxEmployees') {
+        predicate = '<=';
+      }
     };
 
-    const queryString = 
-    `SELECT handle,
-            name,
-            description,
-            num_employees AS "numEmployees",
-            logo_url AS "logoUrl"
-    FROM companies
-    WHERE num_employees >= ${minInt};`;
-
+    //*** Filter by name ***/
+    if(filter === 'name') {
+      colName = 'name';
+      predicate = 'ILIKE';
+      sqlValue = `'%${value}%'`;
+    }
+    
+    queryString = 
+        `SELECT handle,
+          name,
+          description,
+          ${employeeCol}
+          logo_url AS "logoUrl"
+        FROM companies
+        WHERE ${colName} ${predicate} ${sqlValue};`;
+        
     const companyRes = await db.query(queryString);
     const companies = companyRes.rows;
-
-    return companies;
-  }
-
-  /** Filter by company maxEmployees, return data about that company
-   * 
-   *  Returns [{handle, name, description, numEmployees logo_url}]
-   */
-
-  static async getMax(max) {
-    // Convert to an integer and check if valid
-    let maxInt = parseInt(max, 10); 
-
-    if (isNaN(maxInt) || maxInt < 0) {
-      throw new ExpressError(`maxEmployees is either NaN or negative`);
-    };
-
-    const queryString = 
-    `SELECT handle,
-            name,
-            description,
-            num_employees AS "numEmployees",
-            logo_url AS "logoUrl"
-    FROM companies
-    WHERE num_employees <= ${maxInt};`;
-
-    const companyRes = await db.query(queryString);
-    const companies = companyRes.rows;
-
+    
     return companies;
   }
 
@@ -212,6 +191,51 @@ class Company {
             logo_url AS "logoUrl"
     FROM companies
     WHERE name ILIKE '%${name}%'
+      AND num_employees <= ${maxInt};`;
+
+    const companyRes = await db.query(queryString);
+    const companies = companyRes.rows;
+
+    return companies;
+  }
+
+  /** Filter by company name and maxEmployees or minEmployees, return data about that company
+   * 
+   *  Returns [{handle, name, description, numEmployees logo_url}]
+   */
+
+  static async getFilterNameRange(name, min, max) {
+    let andPredicate = ''; // Extra predicate if filter is both min and max
+
+    // if both min and max exist, include in filter
+    if (min && max) {
+      let minInt = parseInt(min, 10);
+      let maxInt = parseInt(max, 10);
+
+      if (isNaN(minInt) || minInt < 0) {
+        throw new ExpressError(`minEmployees is either NaN or negative`);
+      } else if (isNaN(maxInt) || maxInt < 0) {
+        throw new ExpressError(`maxEmployees is either NaN or negative`);
+      } else if (isNaN(maxInt) || maxInt < 0) {
+        throw new ExpressError(`maxEmployees is either NaN or negative`);
+      } else if (minInt > maxInt) {
+        throw new ExpressError('minEmployees cannot be more than maxEmployees');
+      }
+
+      let firstPredicate = `num_employees >= ${minInt},`; // first predicate to filter out min employees
+      andPredicate = `AND num_employees <= ${maxInt}`; // second predicate to filter out max employees
+
+
+    }
+     
+    const queryString = 
+    `SELECT handle,
+            name,
+            description,
+            num_employees AS "numEmployees",
+            logo_url AS "logoUrl"
+    FROM companies
+    WHERE ${firstPredicate}
       AND num_employees <= ${maxInt};`;
 
     const companyRes = await db.query(queryString);
