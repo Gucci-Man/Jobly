@@ -111,6 +111,143 @@ describe("get", function () {
   });
 });
 
+/************************************** get with filters */
+
+describe("get with filters", function () {
+  // TODO: Write getName function
+  test("filter by name works", async function () {
+    let companies = await Company.getName("1");
+    expect(companies).toEqual([
+      {
+        handle: "c1",
+        name: "C1",
+        description: "Desc1",
+        numEmployees: 1,
+        logoUrl: "http://c1.img",
+      }
+    ]);
+  });
+
+  // TODO: Write getMin function
+  test("filter by minEmployees work", async function () {
+    let companies = await Company.getMin("2");
+    expect(companies).toEqual([
+      {
+        handle: "c2",
+        name: "C2",
+        description: "Desc2",
+        numEmployees: 2,
+        logoUrl: "http://c2.img",
+      },
+      {
+        handle: "c3",
+        name: "C3",
+        description: "Desc3",
+        numEmployees: 3,
+        logoUrl: "http://c3.img",
+      },
+    ]);
+  });
+
+  // TODO: Write getMax function
+  test("filter by maxEmployees work", async function () {
+    let companies = await Company.getMax("2");
+    expect(companies).toEqual([
+      {
+        handle: "c1",
+        name: "C1",
+        description: "Desc1",
+        numEmployees: 1,
+        logoUrl: "http://c1.img",
+      },
+      {
+        handle: "c2",
+        name: "C2",
+        description: "Des2",
+        numEmployees: 2,
+        logoUrl: "http://c2.img",
+      },
+    ]);
+  });
+
+  // TODO: Write getNameMax function
+  test("filter by name and maxEmployees work", async function () {
+    let companies = await Company.getNameMax("c", "2");
+    expect(companies).toEqual([
+      {
+        handle: "c2",
+        name: "C2",
+        description: "Des2",
+        numEmployees: 2,
+        logoUrl: "http://c2.img",
+      },
+    ]);
+  });
+
+  // TODO: Write getNameMin function
+  test("filter by name and minEmployees work", async function () {
+    let companies = await Company.getNameMin("c", "3");
+    expect(companies).toEqual([
+      {
+        handle: "c3",
+        name: "C3",
+        description: "Des3",
+        numEmployees: 3,
+        logoUrl: "http://c3.img",
+      },
+    ]);
+  });
+
+  // TODO: Write getMinMax function
+  test("filter by minEmployees and maxEmployees work", async function () {
+    let companies = await Company.getMinMax("3", "3");
+    expect(companies).toEqual([
+      {
+        handle: "c3",
+        name: "C3",
+        description: "Des3",
+        numEmployees: 3,
+        logoUrl: "http://c3.img",
+      },
+    ]);
+  });
+
+  // TODO: Write getMinMax function
+  test("filter with minEmployees greater than maxEmployees fail", async function () {
+    try {
+      await Company.getMinMax("4", "3");
+      fail();
+    } catch (err) {
+      expect(err instanceof NotFoundError).toBeTruthy();
+    }
+  });
+
+  // TODO: Write getFilterAll function
+  test("filter with name, minEmployees and maxEmployees", async function () {
+    let companies = await Company.getFilterAll("c", "3", "3");
+    expect(companies).toEqual([
+      {
+        handle: "c3",
+        name: "C3",
+        description: "Des3",
+        numEmployees: 3,
+        logoUrl: "http://c3.img",
+      },
+    ]);
+  });
+
+  // TODO: Write getFilterAll function
+  test("filter with name, minEmployees and maxEmployees fail if min > max", async function () {
+    try {
+      await Company.getFilterAll("c", "4", "3");
+      fail();
+    } catch (err) {
+      expect(err instanceof NotFoundError).toBeTruthy();
+    }
+  });
+
+});
+
 /************************************** update */
 
 describe("update", function () {
