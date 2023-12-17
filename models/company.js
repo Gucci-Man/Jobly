@@ -1,7 +1,7 @@
 "use strict";
 
 const db = require("../db");
-const { BadRequestError, NotFoundError } = require("../expressError");
+const { BadRequestError, NotFoundError, ExpressError } = require("../expressError");
 const { sqlForPartialUpdate } = require("../helpers/sql");
 
 /** Related functions for companies. */
@@ -86,6 +86,217 @@ class Company {
 
     return company;
   }
+
+  /** Filter by company name, return data about that company
+   * 
+   *  Returns [{handle, name, description, logo_url}]
+   */
+
+  static async getName(name) {
+    const queryString = 
+    `SELECT handle,
+            name,
+            description,
+            logo_url AS "logoUrl"
+    FROM companies
+    WHERE name ILIKE '%${name}%';`;
+
+    const companyRes = await db.query(queryString);
+    const companies = companyRes.rows;
+
+    return companies;
+  }
+
+  /** Filter by company minEmployees, return data about that company
+   * 
+   *  Returns [{handle, name, description, numEmployees logo_url}]
+   */
+
+  static async getMin(min) {
+    // Convert to an integer and check if valid
+    let minInt = parseInt(min, 10); 
+    if (isNaN(minInt) || minInt < 0) {
+      throw new ExpressError(`minEmployees is either NaN or negative`);
+    };
+
+    const queryString = 
+    `SELECT handle,
+            name,
+            description,
+            num_employees AS "numEmployees",
+            logo_url AS "logoUrl"
+    FROM companies
+    WHERE num_employees >= ${minInt};`;
+
+    const companyRes = await db.query(queryString);
+    const companies = companyRes.rows;
+
+    return companies;
+  }
+
+  /** Filter by company maxEmployees, return data about that company
+   * 
+   *  Returns [{handle, name, description, numEmployees logo_url}]
+   */
+
+  static async getMax(max) {
+    // Convert to an integer and check if valid
+    let maxInt = parseInt(max, 10); 
+
+    if (isNaN(maxInt) || maxInt < 0) {
+      throw new ExpressError(`maxEmployees is either NaN or negative`);
+    };
+
+    const queryString = 
+    `SELECT handle,
+            name,
+            description,
+            num_employees AS "numEmployees",
+            logo_url AS "logoUrl"
+    FROM companies
+    WHERE num_employees <= ${maxInt};`;
+
+    const companyRes = await db.query(queryString);
+    const companies = companyRes.rows;
+
+    return companies;
+  }
+
+  /** Filter by company name and minEmployees, return data about that company
+   * 
+   *  Returns [{handle, name, description, numEmployees logo_url}]
+   */
+
+  static async getNameMin(name, min) {
+    // Convert to an integer and check if valid
+    let minInt = parseInt(min, 10); 
+
+    if (isNaN(minInt) || minInt < 0) {
+      throw new ExpressError(`minEmployees is either NaN or negative`);
+    };
+
+    const queryString = 
+    `SELECT handle,
+            name,
+            description,
+            num_employees AS "numEmployees",
+            logo_url AS "logoUrl"
+    FROM companies
+    WHERE name ILIKE '%${name}%'
+      AND num_employees >= ${minInt};`;
+
+    const companyRes = await db.query(queryString);
+    const companies = companyRes.rows;
+
+    return companies;
+  }
+
+  /** Filter by company name and maxEmployees, return data about that company
+   * 
+   *  Returns [{handle, name, description, numEmployees logo_url}]
+   */
+
+  static async getNameMax(name, max) {
+    // Convert to an integer and check if valid
+    let maxInt = parseInt(max, 10); 
+
+    if (isNaN(maxInt) || maxInt < 0) {
+      throw new ExpressError(`maxEmployees is either NaN or negative`);
+    };
+
+    const queryString = 
+    `SELECT handle,
+            name,
+            description,
+            num_employees AS "numEmployees",
+            logo_url AS "logoUrl"
+    FROM companies
+    WHERE name ILIKE '%${name}%'
+      AND num_employees <= ${maxInt};`;
+
+    const companyRes = await db.query(queryString);
+    const companies = companyRes.rows;
+
+    return companies;
+  }
+
+  /** Filter by minEmployees and maxEmployees, return data about that company
+   * 
+   *  Returns [{handle, name, description, numEmployees logo_url}]
+   */
+
+  static async getMinMax(min, max) {
+    // Convert to an integer and check if valid
+    let maxInt = parseInt(max, 10); 
+    let minInt = parseInt(min, 10);
+
+    if (isNaN(minInt) || minInt < 0) {
+      throw new ExpressError(`minEmployees is either NaN or negative`);
+    };
+
+    if (isNaN(maxInt) || maxInt < 0) {
+      throw new ExpressError(`maxEmployees is either NaN or negative`);
+    };
+
+    if (minInt > maxInt) {
+      throw new ExpressError(`minEmployees cannot be greater than maxEmployees`)
+    };
+
+    const queryString = 
+    `SELECT handle,
+            name,
+            description,
+            num_employees AS "numEmployees",
+            logo_url AS "logoUrl"
+    FROM companies
+    WHERE num_employees >= ${minInt}
+      AND num_employees <= ${maxInt};`;
+
+    const companyRes = await db.query(queryString);
+    const companies = companyRes.rows;
+
+    return companies;
+  };
+
+  /** Filter by name, minEmployees and maxEmployees, return data about that company
+   * 
+   *  Returns [{handle, name, description, numEmployees logo_url}]
+   */
+
+  static async getFilterAll(name, min, max) {
+    // Convert to an integer and check if valid
+    let maxInt = parseInt(max, 10); 
+    let minInt = parseInt(min, 10);
+
+    if (isNaN(minInt) || minInt < 0) {
+      throw new ExpressError(`minEmployees is either NaN or negative`);
+    };
+
+    if (isNaN(maxInt) || maxInt < 0) {
+      throw new ExpressError(`maxEmployees is either NaN or negative`);
+    };
+
+    if (minInt > maxInt) {
+      throw new ExpressError(`minEmployees cannot be greater than maxEmployees`)
+    };
+
+    const queryString = 
+    `SELECT handle,
+            name,
+            description,
+            num_employees AS "numEmployees",
+            logo_url AS "logoUrl"
+    FROM companies
+    WHERE name ILIKE '%${name}%' 
+      AND num_employees >= ${minInt}
+      AND num_employees <= ${maxInt};`;
+
+    const companyRes = await db.query(queryString);
+    const companies = companyRes.rows;
+
+    return companies;
+  };
+
 
   /** Update company data with `data`.
    *
