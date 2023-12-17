@@ -53,6 +53,7 @@ router.post("/", ensureLoggedIn, async function (req, res, next) {
 router.get("/", async function (req, res, next) {
   try {
     const companies = await Company.findAll();
+    console.log(`Query string is ${req.query.minEmployees}`)
     return res.json({ companies });
   } catch (err) {
     return next(err);

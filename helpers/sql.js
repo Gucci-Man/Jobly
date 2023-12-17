@@ -29,5 +29,4 @@ function sqlForPartialUpdate(dataToUpdate, jsToSql) {
   };
 }
 
-// Export the sqlForPartialUpdate function for use in other modules.
 module.exports = { sqlForPartialUpdate };
