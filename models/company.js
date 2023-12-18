@@ -154,8 +154,6 @@ class Company {
     if (min && max) {
       let minInt = parseInt(min, 10);
       let maxInt = parseInt(max, 10);
-      console.log(`minInt is ${minInt}`);
-      console.log(`maxInt is ${maxInt}`);
 
       if (isNaN(minInt) || minInt < 0) {
         throw new ExpressError(`minEmployees is either NaN or negative`);
@@ -233,45 +231,6 @@ class Company {
             logo_url AS "logoUrl"
     FROM companies
     WHERE num_employees >= ${minInt}
-      AND num_employees <= ${maxInt};`;
-
-    const companyRes = await db.query(queryString);
-    const companies = companyRes.rows;
-
-    return companies;
-  };
-
-  /** Filter by name, minEmployees and maxEmployees, return data about that company
-   * 
-   *  Returns [{handle, name, description, numEmployees logo_url}]
-   */
-
-  static async getFilterAll(name, min, max) {
-    // Convert to an integer and check if valid
-    let maxInt = parseInt(max, 10); 
-    let minInt = parseInt(min, 10);
-
-    if (isNaN(minInt) || minInt < 0) {
-      throw new ExpressError(`minEmployees is either NaN or negative`);
-    };
-
-    if (isNaN(maxInt) || maxInt < 0) {
-      throw new ExpressError(`maxEmployees is either NaN or negative`);
-    };
-
-    if (minInt > maxInt) {
-      throw new ExpressError(`minEmployees cannot be greater than maxEmployees`)
-    };
-
-    const queryString = 
-    `SELECT handle,
-            name,
-            description,
-            num_employees AS "numEmployees",
-            logo_url AS "logoUrl"
-    FROM companies
-    WHERE name ILIKE '%${name}%' 
-      AND num_employees >= ${minInt}
       AND num_employees <= ${maxInt};`;
 
     const companyRes = await db.query(queryString);

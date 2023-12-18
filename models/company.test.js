@@ -15,6 +15,8 @@ beforeEach(commonBeforeEach);
 afterEach(commonAfterEach);
 afterAll(commonAfterAll);
 
+
+
 /************************************** create */
 
 describe("create", function () {
@@ -114,7 +116,7 @@ describe("get", function () {
 /************************************** get with filters */
 
 describe("get with filters", function () {
-  test("work: filter by minEmployees and maxEmployees", async function () {
+  test("work: filter by minEmployees and maxEmployees with getMinMax", async function () {
     let companies = await Company.getMinMax("3", "3");
     expect(companies).toEqual([
       {
@@ -127,7 +129,7 @@ describe("get with filters", function () {
     ]);
   });
 
-  test("fail: filter with minEmployees greater than maxEmployees", async function () {
+  test("fail: filter with minEmployees greater than maxEmployees with getMinMax", async function () {
     try {
       await Company.getMinMax("4", "3");
       fail();
@@ -136,8 +138,10 @@ describe("get with filters", function () {
     }
   });
 
-  test("work: filter with name, minEmployees and maxEmployees", async function () {
-    let companies = await Company.getFilterAll("c", "3", "3");
+  test("work: filter with name, minEmployees and maxEmployees with getFilterNameRange", async function () {
+    
+
+    let companies = await Company.getFilterNameRange("c", "3", "3");
     expect(companies).toEqual([
       {
         handle: "c3",
@@ -149,34 +153,37 @@ describe("get with filters", function () {
     ]);
   });
 
-  test("fail: filter with name, minEmployees and maxEmployees with min > max", async function () {
+  test("fail: filter with name, minEmployees and maxEmployees with min > max with getFilterNameRange", async function () {
     try {
-      await Company.getFilterAll("c", "4", "3");
-      fail();
+      await Company.getFilterNameRange("c", "4", "3");
+      fail();getNameMin
     } catch (err) {
       expect(err instanceof ExpressError).toBeTruthy();
     }
   });
 
   test("work: filter by name and minEmployees with getFilterNameRange", async function () {
-    let min = "3";
-    let max = null;
-    let companies = await Company.getFilterNameRange("c", min, max);
+    let companies = await Company.getFilterNameRange("c", "2", null);
     expect(companies).toEqual([
+      {
+        handle: "c2",
+        name: "C2",
+        description: "Desc2",
+        numEmployees: 2,
+        logoUrl: "http://c2.img",
+      },
       {
         handle: "c3",
         name: "C3",
         description: "Desc3",
         numEmployees: 3,
         logoUrl: "http://c3.img",
-      },
+      }
     ]);
   });
 
   test("work: filter by name and maxEmployees with getFilterNameRange", async function () {
-    let min = null;
-    let max = "2";
-    let companies = await Company.getFilterNameRange("c", min, max);
+    let companies = await Company.getFilterNameRange("c", null, "2");
     expect(companies).toEqual([
       {
         handle: "c1",
@@ -191,22 +198,7 @@ describe("get with filters", function () {
         description: "Desc2",
         numEmployees: 2,
         logoUrl: "http://c2.img",
-      },
-    ]);
-  });
-
-  test("work: filter by minEmployees and maxEmployees with getFilterNameRange", async function () {
-    let min = "2";
-    let max = "2";
-    let companies = await Company.getFilterNameRange("c", min, max);
-    expect(companies).toEqual([
-      {
-        handle: "c2",
-        name: "C2",
-        description: "Desc2",
-        numEmployees: 2,
-        logoUrl: "http://c2.img",
-      },
+      }
     ]);
   });
 
@@ -228,7 +220,7 @@ describe("get with filters", function () {
         description: "Desc2",
         numEmployees: 2,
         logoUrl: "http://c2.img",
-      },
+      }
     ]);
   });
 
@@ -295,7 +287,7 @@ describe("get with filters", function () {
     ]);
   });
 
-  test("fail: filter with invalid maxEmployees", async function () {
+  test("fail: filter with invalid maxEmployees with getFilterOne", async function () {
     try {
       await Company.getFilterOne("maxEmployees","Nothing");
       fail();
@@ -304,7 +296,7 @@ describe("get with filters", function () {
     }
   });
 
-  test("fail: filter with invalid minEmployees", async function () {
+  test("fail: filter with invalid minEmployees with getFilterOne", async function () {
     try {
       await Company.getFilterOne("minEmployees","Nothing");
       fail();

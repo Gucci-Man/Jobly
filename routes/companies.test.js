@@ -114,6 +114,47 @@ describe("GET /companies", function () {
   });
 
 // TODO: Create filter by minEmployees
+  test("Can filter by name and minEmployees", async function() {
+    const resp = await request(app).get("/companies?name=c&minEmployees=2");
+    expect(resp.body).toEqual({
+      companies:
+      [
+        {
+          handle: "c3",
+          name: "C3",
+          description: "Desc3",
+          numEmployees: 3,
+          logoUrl: "http://c3.img",
+        },
+        {
+          handle: "c2",
+          name: "C2",
+          numEmployees: 2,
+          description: "Desc2",
+          logoUrl: "http://c2.img",
+        }
+      ]
+    });
+  });
+
+  // TODO: Create filter by minEmployees
+  test("Can filter by name and minEmployees", async function() {
+    const resp = await request(app).get("/companies?name=c&minEmployees=3");
+    expect(resp.body).toEqual({
+      companies:
+      [
+        {
+          handle: "c3",
+          name: "C3",
+          description: "Desc3",
+          numEmployees: 3,
+          logoUrl: "http://c3.img",
+        }
+      ]
+    });
+  });
+
+  // TODO: Create filter by minEmployees
   test("Can filter by minEmployees", async function() {
     const resp = await request(app).get("/companies?minEmployees=2");
     expect(resp.body).toEqual({
