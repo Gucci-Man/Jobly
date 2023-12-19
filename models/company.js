@@ -195,6 +195,8 @@ class Company {
     WHERE name ILIKE '%${name}%' 
       AND ${firstPredicate} ${secondPredicate};`;
 
+    console.log(queryString);
+
     const companyRes = await db.query(queryString);
     const companies = companyRes.rows;
 

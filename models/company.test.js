@@ -149,7 +149,7 @@ describe("get with filters", function () {
         description: "Desc3",
         numEmployees: 3,
         logoUrl: "http://c3.img",
-      },
+      }
     ]);
   });
 

@@ -50,10 +50,33 @@ router.post("/", ensureLoggedIn, async function (req, res, next) {
  * Authorization required: none
  */
 
+// TODO: Refactor get route for filters
 router.get("/", async function (req, res, next) {
+  let companies = null;
   try {
-    const companies = await Company.findAll();
-    console.log(`Query string is ${req.query.minEmployees}`)
+    // If name query string exist, then filter
+    if (req.query.name) {
+
+      // If no minEmployee and maxEmployee, then filter by name only
+      if(!req.query.minEmployees && !req.query.maxEmployees) {
+        companies = await Company.getFilterOne('name', req.query.name);
+      } else {
+        companies = await Company.getFilterNameRange(req.query.name, req.query.minEmployees, req.query.maxEmployees);
+      }
+      // If minEmployees query string exist but not maxEmployee
+    } else if (req.query.minEmployees && !req.query.maxEmployees){
+      companies = await Company.getFilterOne('minEmployees', req.query.minEmployees);
+      // If maxEmployees query string exist but not maxEmployee
+    } else if (!req.query.minEmployees && req.query.maxEmployees){
+      companies = await Company.getFilterOne('maxEmployees', req.query.maxEmployees);
+      // If both maxEmployees and minEmployees exist, then filter both
+    } else if(req.query.minEmployees && req.query.maxEmployees){
+      companies = await Company.getMinMax(req.query.minEmployees, req.query.maxEmployees);
+      // Else if no query strings are passed, then default to find all companies
+    } else {
+      companies = await Company.findAll();
+    }
+    
     return res.json({ companies });
   } catch (err) {
     return next(err);
