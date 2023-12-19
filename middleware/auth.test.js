@@ -12,6 +12,43 @@ const { SECRET_KEY } = require("../config");
 const testJwt = jwt.sign({ username: "test", isAdmin: false }, SECRET_KEY);
 const badJwt = jwt.sign({ username: "test", isAdmin: false }, "wrong");
 
+const adminJwt = jwt.sign({username: "test admin", isAdmin: true}, SECRET_KEY); // To test for admin users
+
+// TODO: Create isAdmin method to check if user has the is_admin flag
+describe("isAdmin", function() {
+  test("works", function() {
+    const req = { headers: { authorization: `Bearer ${adminJwt}` } };
+    const res = { locals: {} };
+    const next = function (err) {
+      expect(err).toBeFalsy();
+    };
+    isAdmin(req, res, next);
+    expect(res.locals).toEqual({
+      user: {
+        iat: expect.any(Number),
+        username: "test admin",
+        isAdmin: true,
+      },
+    });
+  });
+
+  test("works: user is not admin", function() {
+    const req = { headers: { authorization: `Bearer ${testJwt}` } };
+    const res = { locals: {} };
+    const next = function (err) {
+      expect(err).toBeFalsy();
+    };
+    isAdmin(req, res, next);
+    expect(res.locals).toEqual({
+      user: {
+        iat: expect.any(Number),
+        username: "test",
+        isAdmin: false,
+      },
+    });
+  });
+});
+
 
 describe("authenticateJWT", function () {
   test("works: via header", function () {
@@ -78,3 +115,5 @@ describe("ensureLoggedIn", function () {
     ensureLoggedIn(req, res, next);
   });
 });
+
+

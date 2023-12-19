@@ -50,7 +50,6 @@ router.post("/", ensureLoggedIn, async function (req, res, next) {
  * Authorization required: none
  */
 
-// TODO: Refactor get route for filters
 router.get("/", async function (req, res, next) {
   let companies = null;
   try {
