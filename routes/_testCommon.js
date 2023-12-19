@@ -6,7 +6,6 @@ const Company = require("../models/company");
 const { createToken } = require("../helpers/tokens");
 
 async function commonBeforeAll() {
-  console.log("Inside commonBeforeAll")
   // noinspection SqlWithoutWhere
   await db.query("DELETE FROM users");
   // noinspection SqlWithoutWhere

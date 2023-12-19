@@ -95,13 +95,13 @@ class Company {
    */
 
   static async getFilterOne(filter, value) {
-    let predicate = null; // The predicate to filter 
-    let colName = null; // Name of column to filter by. Either name or num_employees
-    let queryString = null; // Store query 
-    let employeeCol = "" // Include employee column if filter is applicable. If not leave blank
+    let predicate = null; // The predicate to filter. 
+    let colName = null; // Name of column to filter by. Either name or num_employees.
+    let queryString = null; // SQL query 
+    let employeeCol = "" // Include employee column if filter is applicable. If not leave blank.
     let sqlValue = null; // Updates value dependent on filter
 
-    //***  Filter on number of employees ***/
+    //***  Filter by number of employees ***/
     if (filter === 'minEmployees' || filter === 'maxEmployees') {
       let valueInt = parseInt(value, 10);
       employeeCol = 'num_employees AS "numEmployees",'; 
@@ -109,7 +109,7 @@ class Company {
       sqlValue = value; 
 
       if (isNaN(valueInt) || valueInt < 0) {
-        throw new ExpressError(`${filter} is either NaN or negative`);
+        throw new BadRequestError(`${filter} is either NaN or negative`);
       };
 
       if (filter === 'minEmployees') {
@@ -156,11 +156,11 @@ class Company {
       let maxInt = parseInt(max, 10);
 
       if (isNaN(minInt) || minInt < 0) {
-        throw new ExpressError(`minEmployees is either NaN or negative`);
+        throw new BadRequestError(`minEmployees is either NaN or negative`);
       } else if (isNaN(maxInt) || maxInt < 0) {
-        throw new ExpressError(`maxEmployees is either NaN or negative`);
+        throw new BadRequestError(`maxEmployees is either NaN or negative`);
       } else if (minInt > maxInt) {
-        throw new ExpressError('minEmployees cannot be more than maxEmployees');
+        throw new BadRequestError('minEmployees cannot be more than maxEmployees');
       }
 
       firstPredicate = `num_employees >= ${minInt}`; // first predicate to filter out min employees
@@ -170,7 +170,7 @@ class Company {
       let minInt = parseInt(min, 10);
 
       if (isNaN(minInt) || minInt < 0) {
-        throw new ExpressError(`minEmployees is either NaN or negative`); 
+        throw new BadRequestError(`minEmployees is either NaN or negative`); 
       };
 
       firstPredicate = `num_employees >= ${minInt}`;
@@ -179,7 +179,7 @@ class Company {
       let maxInt = parseInt(max, 10);
 
       if (isNaN(maxInt) || maxInt < 0) {
-        throw new ExpressError(`maxEmployees is either NaN or negative`); 
+        throw new BadRequestError(`maxEmployees is either NaN or negative`); 
       };
 
       firstPredicate = `num_employees <= ${maxInt}`;
@@ -194,8 +194,6 @@ class Company {
     FROM companies
     WHERE name ILIKE '%${name}%' 
       AND ${firstPredicate} ${secondPredicate};`;
-
-    console.log(queryString);
 
     const companyRes = await db.query(queryString);
     const companies = companyRes.rows;
@@ -214,15 +212,15 @@ class Company {
     let minInt = parseInt(min, 10);
 
     if (isNaN(minInt) || minInt < 0) {
-      throw new ExpressError(`minEmployees is either NaN or negative`);
+      throw new BadRequestError(`minEmployees is either NaN or negative`);
     };
 
     if (isNaN(maxInt) || maxInt < 0) {
-      throw new ExpressError(`maxEmployees is either NaN or negative`);
+      throw new BadRequestError(`maxEmployees is either NaN or negative`);
     };
 
     if (minInt > maxInt) {
-      throw new ExpressError(`minEmployees cannot be greater than maxEmployees`)
+      throw new BadRequestError(`minEmployees cannot be greater than maxEmployees`)
     };
 
     const queryString = 

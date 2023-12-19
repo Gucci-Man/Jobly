@@ -134,7 +134,7 @@ describe("get with filters", function () {
       await Company.getMinMax("4", "3");
       fail();
     } catch (err) {
-      expect(err instanceof ExpressError).toBeTruthy();
+      expect(err instanceof BadRequestError).toBeTruthy();
     }
   });
 
@@ -158,7 +158,7 @@ describe("get with filters", function () {
       await Company.getFilterNameRange("c", "4", "3");
       fail();getNameMin
     } catch (err) {
-      expect(err instanceof ExpressError).toBeTruthy();
+      expect(err instanceof BadRequestError).toBeTruthy();
     }
   });
 
@@ -231,7 +231,7 @@ describe("get with filters", function () {
       await Company.getFilterNameRange("c", min, max);
       fail();
     } catch (err) {
-      expect(err instanceof ExpressError).toBeTruthy();
+      expect(err instanceof BadRequestError).toBeTruthy();
     }
   });
 
@@ -292,7 +292,7 @@ describe("get with filters", function () {
       await Company.getFilterOne("maxEmployees","Nothing");
       fail();
     } catch (err) {
-      expect(err instanceof ExpressError).toBeTruthy();
+      expect(err instanceof BadRequestError).toBeTruthy();
     }
   });
 
@@ -301,7 +301,7 @@ describe("get with filters", function () {
       await Company.getFilterOne("minEmployees","Nothing");
       fail();
     } catch (err) {
-      expect(err instanceof ExpressError).toBeTruthy();
+      expect(err instanceof BadRequestError).toBeTruthy();
     }
   });
 

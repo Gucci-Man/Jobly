@@ -189,7 +189,6 @@ describe("GET /companies", function () {
     });
   });
 
-// TODO: Add conditional statement
   test("Error if minEmployees is greater than maxEmployees", async function() {
     const resp = await request(app).get("/companies?minEmployees=3&maxEmployees=1");
     expect(resp.statusCode).toEqual(400);
