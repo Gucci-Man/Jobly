@@ -21,6 +21,8 @@ function authenticateJWT(req, res, next) {
     if (authHeader) {
       const token = authHeader.replace(/^[Bb]earer /, "").trim();
       res.locals.user = jwt.verify(token, SECRET_KEY);
+    
+      //console.log(`res.local.user in JWT function ${decoded}`);
     }
     return next();
   } catch (err) {
@@ -28,14 +30,17 @@ function authenticateJWT(req, res, next) {
   }
 }
 
-/** Middleware to use when they must be logged in.
+/** Middleware to use when they must be logged in and is an admin.
  *
  * If not, raises Unauthorized.
  */
 
 function ensureLoggedIn(req, res, next) {
   try {
-    if (!res.locals.user) throw new UnauthorizedError();
+    // If user token not stored in res or is not an admin, throw error
+    if (!res.locals.user || res.locals.user.isAdmin === false) {
+      throw new UnauthorizedError();
+    }
     return next();
   } catch (err) {
     return next(err);

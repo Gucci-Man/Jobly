@@ -14,41 +14,6 @@ const badJwt = jwt.sign({ username: "test", isAdmin: false }, "wrong");
 
 const adminJwt = jwt.sign({username: "test admin", isAdmin: true}, SECRET_KEY); // To test for admin users
 
-// TODO: Create isAdmin method to check if user has the is_admin flag
-describe("isAdmin", function() {
-  test("works", function() {
-    const req = { headers: { authorization: `Bearer ${adminJwt}` } };
-    const res = { locals: {} };
-    const next = function (err) {
-      expect(err).toBeFalsy();
-    };
-    isAdmin(req, res, next);
-    expect(res.locals).toEqual({
-      user: {
-        iat: expect.any(Number),
-        username: "test admin",
-        isAdmin: true,
-      },
-    });
-  });
-
-  test("works: user is not admin", function() {
-    const req = { headers: { authorization: `Bearer ${testJwt}` } };
-    const res = { locals: {} };
-    const next = function (err) {
-      expect(err).toBeFalsy();
-    };
-    isAdmin(req, res, next);
-    expect(res.locals).toEqual({
-      user: {
-        iat: expect.any(Number),
-        username: "test",
-        isAdmin: false,
-      },
-    });
-  });
-});
-
 
 describe("authenticateJWT", function () {
   test("works: via header", function () {
@@ -98,7 +63,7 @@ describe("ensureLoggedIn", function () {
   test("works", function () {
     expect.assertions(1);
     const req = {};
-    const res = { locals: { user: { username: "test", is_admin: false } } };
+    const res = { locals: { user: { username: "test", isAdmin: true } } };
     const next = function (err) {
       expect(err).toBeFalsy();
     };
@@ -109,6 +74,26 @@ describe("ensureLoggedIn", function () {
     expect.assertions(1);
     const req = {};
     const res = { locals: {} };
+    const next = function (err) {
+      expect(err instanceof UnauthorizedError).toBeTruthy();
+    };
+    ensureLoggedIn(req, res, next);
+  });
+
+  test("works if isAdmin is true", function () {
+    expect.assertions(1);
+    const req = {};
+    const res = { locals: { user: { username: "test", isAdmin: true } } };
+    const next = function (err) {
+      expect(err).toBeFalsy();
+    };
+    ensureLoggedIn(req, res, next);
+  });
+
+  test("Throw error if isAdmin is false", function () {
+    expect.assertions(1);
+    const req = {};
+    const res = { locals: { user: { username: "test", isAdmin: false } } };
     const next = function (err) {
       expect(err instanceof UnauthorizedError).toBeTruthy();
     };
