@@ -271,7 +271,7 @@ describe("PATCH /companies/:handle", function () {
     });
   });
 
-  test("Fails for non-admin users", async function () {
+  test("unauth for non-admin users", async function () {
     const resp = await request(app)
         .patch(`/companies/c1`)
         .send({
@@ -331,7 +331,7 @@ describe("DELETE /companies/:handle", function () {
     expect(resp.body).toEqual({ deleted: "c1" });
   });
 
-  test("fails for non-admin users", async function () {
+  test("unauth for non-admin users", async function () {
     const resp = await request(app)
         .delete(`/companies/c1`)
         .set("authorization", `Bearer ${u1Token}`);

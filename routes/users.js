@@ -46,6 +46,8 @@ router.post("/", ensureLoggedIn, async function (req, res, next) {
 
 /** GET / => { users: [ {username, firstName, lastName, email }, ... ] }
  *
+ * Permitted by admins only.
+ * 
  * Returns list of all users.
  *
  * Authorization required: login
@@ -62,6 +64,8 @@ router.get("/", ensureLoggedIn, async function (req, res, next) {
 
 
 /** GET /[username] => { user }
+ * 
+ * Permitted by admins or the user of the requested account.
  *
  * Returns { username, firstName, lastName, isAdmin }
  *
@@ -79,6 +83,8 @@ router.get("/:username", ensureLoggedIn, async function (req, res, next) {
 
 
 /** PATCH /[username] { user } => { user }
+ * 
+ * Permitted by admins or the user of requested account.
  *
  * Data can include:
  *   { firstName, lastName, password, email }
@@ -105,6 +111,8 @@ router.patch("/:username", ensureLoggedIn, async function (req, res, next) {
 
 
 /** DELETE /[username]  =>  { deleted: username }
+ * 
+ * Permitted by admins or the user of the requested account.
  *
  * Authorization required: login
  **/
