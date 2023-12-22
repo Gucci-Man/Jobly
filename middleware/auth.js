@@ -4,7 +4,7 @@
 
 const jwt = require("jsonwebtoken");
 const { SECRET_KEY } = require("../config");
-const { UnauthorizedError} = require("../expressError");
+const { UnauthorizedError } = require("../expressError");
 
 
 /** Middleware: Authenticate user.
@@ -54,9 +54,9 @@ function ensureLoggedIn(req, res, next) {
 
 function ensureUserOrAdmin(req, res, next) {
   try {
-    // check if username query exist, if not, throw error
-    if (!req.params.username){
-      throw new UnauthorizedError('Missing username parameter');
+    // check if username query exist and if logged in.
+    if (!req.params.username || !res.locals.user){
+      throw new UnauthorizedError();
     }
     // Access authenticated user information
     const user = res.locals.user;
