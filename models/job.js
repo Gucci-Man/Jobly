@@ -17,7 +17,6 @@ class Job {
    *
    * */
 
-    // TODO: Write tests !!!!!!!!!!!!!!!!!!!!!!
     static async create({title, salary, equity, handle}) {
         // Check if company exist, if not throw error
         const companyCheck = await db.query(
@@ -52,8 +51,39 @@ class Job {
         job.equity = parseFloat(job.equity);
 
         return job;
-    }
+    };
 
+    /** Find all jobs.
+   *
+   * Returns [{ title, salary, equity, company_handle }, ...]
+   * */
+
+    static async findAll() {
+        const jobsRes = await db.query(
+            `SELECT title, 
+            salary, 
+            equity, 
+            company_handle AS handle
+            FROM jobs
+            ORDER BY title`);
+
+        // convert equity to a float type
+        for (let job of jobsRes.rows) {
+            job.equity = parseFloat(job.equity);
+        }
+        return jobsRes.rows;
+    };
+
+    /** Filter by job title, minSalary or equity, return data about that job.
+   *
+   * Takes a filter keyword ("title", "minSalary", "hasEquity") and corresponding value.
+   * 
+   * Returns [{ title, salary, equity, company_handle },...]
+   *  
+   * Throws NotFoundError if not found.
+   **/
+
+    // TODO Create Get jobs with filters!!!!
 
 }
 
