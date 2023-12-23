@@ -159,6 +159,25 @@ describe("update", function () {
         } catch (err) {
             expect(err instanceof BadRequestError).toBeTruthy();
         }
-    })
+    });
+});
 
-})
+/************************************** remove */
+
+describe("remove", function () {
+    test("works", async function () {
+        await Job.remove(testJobIds[0]);
+        const res = await db.query(
+            `SELECT * FROM jobs WHERE id = ${testJobIds[0]}`);
+        expect(res.rows.length).toEqual(0);
+    });
+
+    test("not found if no such job id", async function() {
+        try {
+            await Job.remove(0);
+            fail();
+        } catch (err) {
+            expect(err instanceof NotFoundError).toBeTruthy();
+        }
+    });
+});
