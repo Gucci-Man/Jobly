@@ -17,38 +17,23 @@ class Job {
    *
    * */
 
-    static async create({title, salary, equity, handle}) {
+    static async create({title, salary, equity, company_handle}) {
         // Check if company exist, if not throw error
         const companyCheck = await db.query(
             `SELECT handle 
             FROM companies 
             WHERE handle = $1`,
-            [handle]);
+            [company_handle]);
 
         if (!companyCheck.rows[0])
-            throw new BadRequestError(`Company doesn't exist: ${handle}`);
-        
-        // Check if job already exist, if it does throw error
-        const jobCheck = await db.query(
-            `SELECT company_handle AS handle, title
-            FROM jobs 
-            WHERE company_handle = $1 
-            AND title = $2`, 
-            [handle, title]);
-        
-        if (jobCheck.rows[0])
-            throw new BadRequestError(`Job already exist: ${title}`);
+            throw new BadRequestError(`Company doesn't exist: ${company_handle}`);
 
-        const result = await db.query(
+        const job = await db.query(
             `INSERT INTO jobs 
             (title, salary, equity, company_handle)
             VALUES ($1, $2, $3, $4)
-            RETURNING title, salary, equity, company_handle AS handle;`,
-            [title, salary, equity, handle]);
-
-        // convert equity to a float type
-        const job = result.rows[0];
-        job.equity = parseFloat(job.equity);
+            RETURNING id, title, salary, equity, company_handle;`,
+            [title, salary, equity, company_handle]);
 
         return job;
     };
@@ -60,17 +45,14 @@ class Job {
 
     static async findAll() {
         const jobsRes = await db.query(
-            `SELECT title, 
+            `SELECT id, 
+            title, 
             salary, 
             equity, 
-            company_handle AS handle
+            company_handle 
             FROM jobs
-            ORDER BY title`);
+            ORDER BY id`);
 
-        // convert equity to a float type
-        for (let job of jobsRes.rows) {
-            job.equity = parseFloat(job.equity);
-        }
         return jobsRes.rows;
     };
 
@@ -85,6 +67,40 @@ class Job {
 
     // TODO Create Get jobs with filters!!!!
 
+
+    /** Update job data with `data`.
+   *
+   * This is a "partial update" --- it's fine if data doesn't contain all the
+   * fields; this only changes provided ones.
+   *
+   * Data can include: { title, salary, equity }. 
+   * 
+   * Cannot change the ID of a job, nor the company handle
+   *
+   * Returns { id, title, salary, equity, company_handle }
+   *
+   * Throws NotFoundError if not found.
+   */
+
+    static async update(id, data) {
+        const { setCols, values } = sqlForPartialUpdate(data, {})
+        const idVarIdx = "$" + (values.length + 1);
+
+        const querySql = `UPDATE jobs
+                            SET ${setCols}
+                            WHERE id = ${idVarIdx}
+                            RETURNING id,
+                                    title,
+                                    salary,
+                                    equity,
+                                    company_handle`
+        const result = await db.query(querySql, [...values, id]);
+        const job = result.rows[0];
+
+        if (!job) throw new NotFoundError(`No job with id: ${id}`);
+
+        return job;
+    };
 }
 
 
