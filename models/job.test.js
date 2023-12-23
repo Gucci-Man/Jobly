@@ -85,6 +85,30 @@ describe("findAll", function() {
     });
 });
 
+/************************************** get */
+
+describe("get", function () {
+    test("works", async function () {
+        let job = await Job.get(testJobIds[0]);
+        expect(job).toEqual({
+            id: testJobIds[0],
+            title: "Tester 1",
+            salary: 100,
+            equity: '0',
+            company_handle: "c1",
+        });
+    });
+
+    test("not found if no such job exist", async function () {
+        try {
+            await Job.get(0);
+            fail();
+        } catch (err) {
+            expect(err instanceof NotFoundError).toBeTruthy();
+        }
+    });
+})
+
 /************************************** update */
 
 describe("update", function () {
@@ -101,6 +125,40 @@ describe("update", function () {
             company_handle: "c1",
             ...updateData
         });
+    });
+
+    test("works: null fields", async function () {
+        const updateDataSetNulls = {
+            title: "New Tester",
+            salary: null,
+            equity: null,
+        }
+
+        let job = await Job.update(testJobIds[0], updateDataSetNulls);
+        expect(job).toEqual({
+            id: testJobIds[0],
+            company_handle: "c1",
+            ...updateDataSetNulls
+        });
+    });
+
+    test("not found if no such job id", async function () {
+        try {
+            await Job.update(0, updateData);
+            fail();
+        } catch (err) {
+            console.log(`typeof of err is ${typeof err}`)
+            expect(err instanceof NotFoundError).toBeTruthy();
+        }
+    });
+
+    test("bad request with no data", async function() {
+        try {
+            await Job.update(testJobIds, {});
+            fail();
+        } catch (err) {
+            expect(err instanceof BadRequestError).toBeTruthy();
+        }
     })
 
 })

@@ -13,7 +13,7 @@ class Job {
    *
    * data should be { title, salary, equity, company_handle }
    *
-   * Returns { title, salary, equity, company_handle }
+   * Returns { id, title, salary, equity, company_handle }
    *
    * */
 
@@ -37,6 +37,33 @@ class Job {
 
         return job;
     };
+
+    /** Given a job id, return data about job.
+   *
+   * Returns { id, title, salary, equity, company_handle }
+   *   where jobs is [{ id, title, salary, equity, company_handle }, ...]
+   *
+   * Throws NotFoundError if not found.
+   **/
+
+    static async get(id) {
+        const jobRes = await db.query(
+            `SELECT id,
+                title,
+                salary,
+                equity,
+                company_handle
+            FROM jobs
+            WHERE id = $1`,
+            [id]);
+
+        const job = jobRes.rows[0];
+
+        if (!job) throw new NotFoundError(`No job with id: ${id}`);
+
+        return job;
+    }
+
 
     /** Find all jobs.
    *
@@ -83,7 +110,7 @@ class Job {
    */
 
     static async update(id, data) {
-        const { setCols, values } = sqlForPartialUpdate(data, {})
+        const { setCols, values } = sqlForPartialUpdate(data, {});
         const idVarIdx = "$" + (values.length + 1);
 
         const querySql = `UPDATE jobs
@@ -93,10 +120,11 @@ class Job {
                                     title,
                                     salary,
                                     equity,
-                                    company_handle`
+                                    company_handle`;
         const result = await db.query(querySql, [...values, id]);
         const job = result.rows[0];
 
+       
         if (!job) throw new NotFoundError(`No job with id: ${id}`);
 
         return job;
