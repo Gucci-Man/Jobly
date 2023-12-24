@@ -55,7 +55,7 @@ router.post("/", ensureLoggedIn, async function (req, res, next) {
  * Authorization required: none
  */
 
-router.get("/", async function (req, res, next) {
+/* router.get("/", async function (req, res, next) {
     let jobs = null;
     try {
         if (req.query.title) {
@@ -64,6 +64,26 @@ router.get("/", async function (req, res, next) {
             jobs = await Job.findAll();
         }
 
+        return res.json({ jobs });
+    } catch (err) {
+        return next(err);
+    }
+}); */
+
+router.get("/", async function (req, res, next) {
+    const q = req.query;
+    // arrive as strings from querystring, but we want as int/bool
+    if (q.minSalary !== undefined) q.minSalary = +q.minSalary
+    q.hasEquity = q.hasEquity === "true";
+
+    try {
+        const validator = jsonschema.validate(q, jobSearchSchema);
+        if (!validator.valid) {
+            const errs = validator.errors.map(e => e.stack);
+            throw new BadRequestError(errs);
+        }
+
+        const jobs = await Job.findAll(q);
         return res.json({ jobs });
     } catch (err) {
         return next(err);

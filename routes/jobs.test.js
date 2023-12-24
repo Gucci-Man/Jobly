@@ -90,6 +90,7 @@ describe("GET /jobs", function () {
                         salary: 100,
                         equity: '0',
                         companyHandle: 'c1',
+                        companyName: 'C1',
                     },
                     {   
                         id: testJobIds[1],
@@ -97,6 +98,7 @@ describe("GET /jobs", function () {
                         salary: 200,
                         equity: '0.5',
                         companyHandle: 'c2',
+                        companyName: 'C2',
                     },
                     {   
                         id: testJobIds[2],
@@ -104,6 +106,7 @@ describe("GET /jobs", function () {
                         salary: 300,
                         equity: '0.1',
                         companyHandle: 'c3',
+                        companyName: 'C3',
                     },
                 ]
         });
