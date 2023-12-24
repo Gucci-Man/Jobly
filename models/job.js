@@ -161,6 +161,7 @@ class Job {
 
         if (!job) throw new NotFoundError(`No job with id: ${id}`);
     }
+
 };
 
 
