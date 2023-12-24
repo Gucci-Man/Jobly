@@ -28,6 +28,7 @@ router.post("/", ensureLoggedIn, async function (req, res, next) {
     try {
         const validator = jsonschema.validate(req.body, jobNewSchema);
         if (!validator.valid) {
+            console.log("Inside invalid schema");
             const errs = validator.errors.map(e => e.stack);
             throw new BadRequestError(errs);
         }

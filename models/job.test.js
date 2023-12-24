@@ -21,14 +21,14 @@ describe("create", function () {
         title: "New Tester",
         salary: 200,
         equity: '0.5',
-        company_handle: "c1",
+        companyHandle: "c1",
     };
 
     test("works", async function () {
         await Job.create(newJob);
 
         const result = await db.query(
-            `SELECT id, title, salary, equity, company_handle
+            `SELECT id, title, salary, equity, company_handle AS "companyHandle"
             FROM jobs 
             WHERE title = 'New Tester'`);
     
