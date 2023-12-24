@@ -46,7 +46,7 @@ describe("create", function () {
                 title: "Tester",
                 salary: 200,
                 equity: '0.5',
-                company_handle: "None",
+                companyHandle: "None",
             });
         } catch (err) {
             expect(err instanceof BadRequestError).toBeTruthy();
@@ -65,21 +65,21 @@ describe("findAll", function() {
                 title: "Tester 1",
                 salary: 100,
                 equity: '0',
-                company_handle: "c1",
+                companyHandle: "c1",
             },
             {   
                 id: testJobIds[1],
                 title: "Tester 2",
                 salary: 200,
                 equity: '0.2',
-                company_handle: "c2",
+                companyHandle: "c2",
             },
             {   
                 id: testJobIds[2],
                 title: "Tester 3",
                 salary: 300,
                 equity: '1',
-                company_handle: "c3",
+                companyHandle: "c3",
             },
         ]);
     });
@@ -95,7 +95,7 @@ describe("get", function () {
             title: "Tester 1",
             salary: 100,
             equity: '0',
-            company_handle: "c1",
+            companyHandle: "c1",
         });
     });
 
@@ -122,7 +122,7 @@ describe("update", function () {
         let job = await Job.update(testJobIds[0], updateData);
         expect(job).toEqual({
             id: testJobIds[0],
-            company_handle: "c1",
+            companyHandle: "c1",
             ...updateData
         });
     });
@@ -137,7 +137,7 @@ describe("update", function () {
         let job = await Job.update(testJobIds[0], updateDataSetNulls);
         expect(job).toEqual({
             id: testJobIds[0],
-            company_handle: "c1",
+            companyHandle: "c1",
             ...updateDataSetNulls
         });
     });
