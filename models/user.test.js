@@ -141,6 +141,7 @@ describe("get", function () {
       lastName: "U1L",
       email: "u1@email.com",
       isAdmin: false,
+      applications: [testJobIds[0],testJobIds[1],],
     });
   });
 
@@ -234,12 +235,12 @@ describe("remove", function () {
 
 describe("applyToJob", function () {
   test("works", async function () {
-    await User.applyToJob("u1", testJobIds[1]);
+    await User.applyToJob("u1", testJobIds[2]);
 
     const res = await db.query(
-      "SELECT * FROM applications WHERE job_id = $1", [testJobIds[1]]);
+      "SELECT * FROM applications WHERE job_id = $1", [testJobIds[2]]);
     expect(res.rows).toEqual([{
-      job_id: testJobIds[1],
+      job_id: testJobIds[2],
       username: 'u1',
     }]);
   });

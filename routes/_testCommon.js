@@ -101,7 +101,10 @@ async function commonBeforeAll() {
     equity: '0.1',
     companyHandle: 'c3',
   });
-  
+
+  await User.applyToJob('u1',j1.id);
+  await User.applyToJob('u2',j1.id);
+ 
   testJobIds.push(j1.id);
   testJobIds.push(j2.id);
   testJobIds.push(j3.id);

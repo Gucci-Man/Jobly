@@ -210,8 +210,6 @@ describe("GET /users", function () {
 
 /************************************** GET /users/:username */
 
-// TODO: Create tests for admins or the user of a requested account to retrieve info
-
 describe("GET /users/:username", function () {
   test("works for users", async function () {
     const resp = await request(app)
@@ -224,6 +222,7 @@ describe("GET /users/:username", function () {
         lastName: "U1L",
         email: "user1@user.com",
         isAdmin: false,
+        applications: [testJobIds[0]],
       },
     });
   });
@@ -239,6 +238,7 @@ describe("GET /users/:username", function () {
         lastName: "U1L",
         email: "user1@user.com",
         isAdmin: false,
+        applications: [testJobIds[0]],
       },
     });
   });
@@ -265,8 +265,6 @@ describe("GET /users/:username", function () {
 });
 
 /************************************** PATCH /users/:username */
-
-// TODO: Create tests for admins or the user of a requested account to update info
 
 describe("PATCH /users/:username", () => {
   test("works for users", async function () {
@@ -367,8 +365,6 @@ describe("PATCH /users/:username", () => {
 
 /************************************** DELETE /users/:username */
 
-// TODO: Create tests for admins or the user of a requested account to delete their own account
-
 describe("DELETE /users/:username", function () {
   test("works for users", async function () {
     const resp = await request(app)
@@ -410,9 +406,9 @@ describe("DELETE /users/:username", function () {
 describe("POST /users/:username/jobs/:id", function () {
   test("works for admin", async function () {
     const resp = await request(app)
-      .post(`/users/u1/jobs/${testJobIds[1]}`)
+      .post(`/users/u1/jobs/${testJobIds[2]}`)
       .set("authorization", `Bearer ${u2Token}`);
-    expect(resp.body).toEqual({ applied: testJobIds[1]});
+    expect(resp.body).toEqual({ applied: testJobIds[2]});
   });
 
   test("works for same user", async function () {
