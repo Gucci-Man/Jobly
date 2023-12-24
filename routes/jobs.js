@@ -120,7 +120,7 @@ router.patch("/:id", ensureLoggedIn, async function (req, res, next) {
 router.delete("/:id", ensureLoggedIn, async function (req, res, next) {
     try {
         await Job.remove(req.params.id);
-        return res.json({ deleted: req.params.id });
+        return res.json({ deleted: parseInt(req.params.id, 10) });
     } catch (err) {
         return next(err);
     }
