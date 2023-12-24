@@ -65,24 +65,10 @@ class Job {
         return job;
     }
 
-
     /** Find all jobs.
    *
    * Returns [{ title, salary, equity, company_handle }, ...]
    * */
-
-/*     static async findAll() {
-        const jobsRes = await db.query(
-            `SELECT id, 
-            title, 
-            salary, 
-            equity, 
-            company_handle AS "companyHandle"
-            FROM jobs
-            ORDER BY id`);
-
-        return jobsRes.rows;
-    }; */
 
     static async findAll({ minSalary, hasEquity, title } = {}) {
         let query = `SELECT j.id,
@@ -123,18 +109,6 @@ class Job {
         const jobsRes = await db.query(query, queryValues);
         return jobsRes.rows;
     };
-
-    /** Filter by job title, minSalary or equity, return data about that job.
-   *
-   * Takes a filter keyword ("title", "minSalary", "hasEquity") and corresponding value.
-   * 
-   * Returns [{ title, salary, equity, company_handle },...]
-   *  
-   * Throws NotFoundError if not found.
-   **/
-
-    // TODO Create Get jobs with filters!!!!
-
 
     /** Update job data with `data`.
    *
@@ -187,7 +161,7 @@ class Job {
 
         if (!job) throw new NotFoundError(`No job with id: ${id}`);
     }
-}
+};
 
 
 module.exports = Job;

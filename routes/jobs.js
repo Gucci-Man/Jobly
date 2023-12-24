@@ -55,21 +55,6 @@ router.post("/", ensureLoggedIn, async function (req, res, next) {
  * Authorization required: none
  */
 
-/* router.get("/", async function (req, res, next) {
-    let jobs = null;
-    try {
-        if (req.query.title) {
-            console.log("Filtering by job title...");
-        } else {
-            jobs = await Job.findAll();
-        }
-
-        return res.json({ jobs });
-    } catch (err) {
-        return next(err);
-    }
-}); */
-
 router.get("/", async function (req, res, next) {
     const q = req.query;
     // arrive as strings from querystring, but we want as int/bool
